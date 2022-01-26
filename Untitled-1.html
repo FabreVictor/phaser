@@ -20,14 +20,16 @@ src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
                  
             scene: {preload: preload, create: create, update: update }
             };
-            new Phaser.Game(config);
-            function preload(){
+        new Phaser.Game(config);
+        function preload(){
             this.load.image('sky', 'assets/sky.png');
             this.load.image('ground', 'assets/platform.png');
             this.load.image('star', 'assets/star.png');
             this.load.image('bomb', 'assets/bomb.png');
             this.load.spritesheet('perso','assets/perso.png',
             { frameWidth: 32, frameHeight: 48 });
+            this.load.image('tiles', 'assets/platform.png');
+            this.load.tilemapTiledJSON('map', 'tiled test.json');
             
             }
         function create(){
@@ -80,7 +82,6 @@ function create (){
     this.add.image(400, 300, 'sky');
         platforms = this.physics.add.staticGroup();
         platforms.create(400, 568, 'ground').setScale(2).refreshBody();
-        platforms.create(800, 568, 'ground').setScale(2).refreshBody();
         platforms.create(600, 400, 'ground');
         platforms.create(50, 250, 'ground');
         platforms.create(750, 220, 'ground');
@@ -128,6 +129,40 @@ function create (){
         this.cameras.main.setBounds(0,0,1920*3,600);
         this.cameras.main.setSize(1000,1000);
         this.cameras.main.startFollow(player);
+
+        function create ()
+{
+    var map = this.make.tilemap({ key: 'map' });
+
+    // The first parameter is the name of the tileset in Tiled and the second parameter is the key
+    // of the tileset image used when loading the file in preload.
+    var tiles = map.addTilesetImage('cybernoid', 'tiles');
+
+    // You can load a layer from the map using the layer name from Tiled, or by using the layer
+    // index (0 in this case).
+    var layer = map.createLayer(0, tiles, 0, 0);
+
+    this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
+
+    var cursors = this.input.keyboard.createCursorKeys();
+    var controlConfig = {
+        camera: this.cameras.main,
+        left: cursors.left,
+        right: cursors.right,
+        up: cursors.up,
+        down: cursors.down,
+        speed: 0.5
+    };
+    controls = new Phaser.Cameras.Controls.FixedKeyControl(controlConfig);
+
+    var help = this.add.text(16, 16, 'Arrow keys to scroll', {
+        fontSize: '18px',
+        padding: { x: 10, y: 5 },
+        backgroundColor: '#000000',
+        fill: '#ffffff'
+    });
+    help.setScrollFactor(0);
+}
     }
 function hitBomb(player, bomb){
     this.physics.pause();
@@ -153,7 +188,13 @@ function collectStar(player, star){
         bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
         bomb.allowGravity = false; //elle n’est pas soumise à la gravité
         }
-        
+
+    function preload ()
+{
+    this.load.image('tiles', 'assets/platform.png');
+    this.load.tilemapTiledJSON('map', 'tiled test.json');
+}
+
 }      
     </script>
     </body>
